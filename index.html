@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline & Countdown</title>
+    <style>
+        /* Base Variables & Reset */
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent: #3b82f6;
+            --unit-bg: #f1f5f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        /* Container Layout */
+        .container {
+            background: var(--card-bg);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 900px;
+            padding: 5rem 3rem;
+            text-align: center;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 4rem;
+            font-weight: 500;
+        }
+
+        /* Input Section */
+        .input-section {
+            margin-bottom: 4rem;
+        }
+
+        input[type="datetime-local"] {
+            font-family: inherit;
+            font-size: 1.25rem;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            color: var(--text-main);
+            background-color: var(--card-bg);
+            outline: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        input[type="datetime-local"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Results Display */
+        #results {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .total-days {
+            font-size: 5rem;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .total-days-label {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 1rem;
+            margin-bottom: 4rem;
+            font-weight: 600;
+        }
+
+        /* Breakdown Grid */
+        .breakdown {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .time-box {
+            background: var(--unit-bg);
+            border-radius: 20px;
+            padding: 1.5rem 1rem;
+            flex: 1 1 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .time-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .time-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.5rem;
+            font-weight: 600;
+        }
+
+        #pastMessage {
+            display: none;
+            color: #ef4444;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #fef2f2;
+            border-radius: 16px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            .container { padding: 3rem 1.5rem; }
+            h1 { font-size: 2.2rem; }
+            .subtitle { font-size: 0.95rem; margin-bottom: 3rem; }
+            .total-days { font-size: 3.5rem; }
+            .total-days-label { font-size: 1rem; margin-bottom: 3rem; }
+            .breakdown { gap: 1rem; }
+            .time-box { padding: 1rem; flex: 1 1 80px; border-radius: 16px; }
+            .time-value { font-size: 1.8rem; }
+            input[type="datetime-local"] { font-size: 1rem; padding: 0.8rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Select a Date</h1>
+        <p class="subtitle">Calculations based on Malaysia Time (GMT+8)</p>
+
+        <div class="input-section">
+            <input type="datetime-local" id="targetDate" aria-label="Select Date and Time">
+        </div>
+
+        <div id="results">
+            <div class="total-days" id="totalDays">0.00000</div>
+            <div class="total-days-label">Total Days Remaining</div>
+
+            <!-- Breakdown: Hides larger units if they are zero -->
+            <div class="breakdown">
+                <div class="time-box" id="box-years">
+                    <span class="time-value" id="val-years">0</span>
+                    <span class="time-label">Years</span>
+                </div>
+                <div class="time-box" id="box-months">
+                    <span class="time-value" id="val-months">0</span>
+                    <span class="time-label">Months</span>
+                </div>
+                <div class="time-box" id="box-weeks">
+                    <span class="time-value" id="val-weeks">0</span>
+                    <span class="time-label">Weeks</span>
+                </div>
+                <div class="time-box" id="box-days">
+                    <span class="time-value" id="val-days">0</span>
+                    <span class="time-label">Days</span>
+                </div>
+                <div class="time-box" id="box-hours">
+                    <span class="time-value" id="val-hours">0</span>
+                    <span class="time-label">Hours</span>
+                </div>
+                <div class="time-box" id="box-minutes">
+                    <span class="time-value" id="val-minutes">0</span>
+                    <span class="time-label">Minutes</span>
+                </div>
+                <div class="time-box" id="box-seconds">
+                    <span class="time-value" id="val-seconds">0</span>
+                    <span class="time-label">Seconds</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="pastMessage">
+            The selected date has already passed!
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const input = document.getElementById('targetDate');
+            const results = document.getElementById('results');
+            const pastMessage = document.getElementById('pastMessage');
+
+            // Time constants in milliseconds
+            const second = 1000;
+            const minute = second * 60;
+            const hour = minute * 60;
+            const day = hour * 24;
+            const week = day * 7;
+            const month = day * 30.436875; // average month
+            const year = day * 365.2425;   // average year
+
+            let timerInterval;
+
+            // Load saved date from local storage
+            const savedDate = localStorage.getItem('myCountdownDate');
+            if (savedDate) {
+                input.value = savedDate;
+                startTimer();
+            }
+
+            input.addEventListener('change', () => {
+                if (input.value) {
+                    localStorage.setItem('myCountdownDate', input.value);
+                    startTimer();
+                } else {
+                    localStorage.removeItem('myCountdownDate');
+                    stopTimer();
+                }
+            });
+
+            function startTimer() {
+                clearInterval(timerInterval);
+                calculateTime(); // run immediately to avoid 1s delay
+                timerInterval = setInterval(calculateTime, 1000);
+            }
+
+            function stopTimer() {
+                clearInterval(timerInterval);
+                results.style.display = 'none';
+                pastMessage.style.display = 'none';
+            }
+
+            function calculateTime() {
+                const inputVal = input.value;
+                if (!inputVal) return stopTimer();
+
+                // Treat the selected time strictly as GMT+8
+                const targetStr = inputVal + ':00+08:00';
+                const targetTime = new Date(targetStr).getTime();
+                const now = new Date().getTime(); 
+
+                const diff = targetTime - now;
+
+                if (diff < 0) {
+                    clearInterval(timerInterval);
+                    results.style.display = 'none';
+                    pastMessage.style.display = 'block';
+                    return;
+                }
+
+                results.style.display = 'block';
+                pastMessage.style.display = 'none';
+
+                // 1. Calculate and display exact total days ticking down
+                const exactTotalDays = (diff / day).toFixed(5); 
+                document.getElementById('totalDays').textContent = exactTotalDays;
+
+                // 2. Calculate hierarchical breakdown
+                let remaining = diff;
+
+                const y = Math.floor(remaining / year);
+                remaining -= y * year;
+
+                const m = Math.floor(remaining / month);
+                remaining -= m * month;
+
+                const w = Math.floor(remaining / week);
+                remaining -= w * week;
+
+                const d = Math.floor(remaining / day);
+                remaining -= d * day;
+
+                const h = Math.floor(remaining / hour);
+                remaining -= h * hour;
+
+                const min = Math.floor(remaining / minute);
+                remaining -= min * minute;
+
+                const s = Math.floor(remaining / second);
+
+                // Update DOM text
+                const timeData = [
+                    { id: 'box-years', valId: 'val-years', value: y },
+                    { id: 'box-months', valId: 'val-months', value: m },
+                    { id: 'box-weeks', valId: 'val-weeks', value: w },
+                    { id: 'box-days', valId: 'val-days', value: d },
+                    { id: 'box-hours', valId: 'val-hours', value: h },
+                    { id: 'box-minutes', valId: 'val-minutes', value: min },
+                    { id: 'box-seconds', valId: 'val-seconds', value: s }
+                ];
+
+                // Logic to hide leading zeros (e.g., don't show "Years" if it's 0)
+                let showRemaining = false;
+
+                timeData.forEach((unit, index) => {
+                    document.getElementById(unit.valId).textContent = unit.value;
+                    const box = document.getElementById(unit.id);
+                    
+                    // Always show seconds, or show if value > 0, or if a larger unit was > 0
+                    if (unit.value > 0 || showRemaining || index === timeData.length - 1) {
+                        box.style.display = 'flex';
+                        showRemaining = true; // Once a non-zero unit is hit, show all smaller units
+                    } else {
+                        box.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

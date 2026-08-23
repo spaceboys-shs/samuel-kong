@@ -8,10 +8,11 @@
         /* Color Variables - Blue Theme */
         :root {
             --bg-color: #ffffff;
+            --bg-marquee: rgba(96, 165, 250, 0.12); /* Very light blue for background text */
             --text-main: #1e3a8a; /* Dark blue for the main title */
             --text-title: #2563eb; /* Bright blue for card titles */
             --text-desc: #60a5fa; /* Light blue for description text */
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.85); /* Slightly transparent white */
             --shadow-color: rgba(37, 99, 235, 0.1);
             --shadow-hover: rgba(37, 99, 235, 0.25);
         }
@@ -33,10 +34,61 @@
             justify-content: center;
             min-height: 100vh;
             padding: 2rem;
-            overflow-x: hidden;
+            overflow: hidden; /* Prevent scrolling caused by the background */
+            position: relative;
         }
 
-        /* Main Title Styles */
+        /* --- Infinite Marquee Background Styles --- */
+        .marquee-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly; /* Evenly space the rows vertically */
+            overflow: hidden;
+            pointer-events: none; /* Clicks will pass through to the cards */
+        }
+
+        .marquee-row {
+            display: flex;
+            width: max-content;
+        }
+
+        .marquee-text {
+            font-size: 6rem;
+            font-weight: 900;
+            color: var(--bg-marquee);
+            white-space: nowrap;
+            padding-right: 1rem;
+            user-select: none; /* Prevent text highlighting */
+        }
+
+        /* Animations for left and right scrolling */
+        @keyframes scrollLeft {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes scrollRight {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Apply animations to alternating rows */
+        .marquee-row.left {
+            animation: scrollLeft 30s linear infinite;
+        }
+
+        .marquee-row.right {
+            animation: scrollRight 30s linear infinite;
+        }
+
+
+        /* --- Main Content Styles --- */
         h1 {
             font-size: 4rem;
             font-weight: 800;
@@ -44,47 +96,50 @@
             margin-bottom: 4rem;
             text-align: center;
             animation: fadeInDown 0.8s ease-out;
+            position: relative;
+            z-index: 1;
+            /* Add a tiny white glow so the title stays readable over the moving text */
+            text-shadow: 0 0 20px rgba(255,255,255,0.8), 0 0 40px rgba(255,255,255,0.8);
         }
 
-        /* Projects Container */
         .projects-container {
             display: flex;
             gap: 3rem;
             max-width: 900px;
             width: 100%;
             justify-content: center;
-            flex-wrap: wrap; /* Automatically wrap on smaller screens */
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
         }
 
         /* Floating Card Styles */
         .card {
             background-color: var(--card-bg);
-            text-decoration: none; /* Remove underline from links */
+            backdrop-filter: blur(8px); /* Blurs the moving text behind the card */
+            -webkit-backdrop-filter: blur(8px);
+            text-decoration: none;
             border-radius: 24px;
             padding: 3rem 2rem;
             flex: 1;
             min-width: 280px;
             max-width: 400px;
             text-align: center;
-            /* Initial shadow for floating effect */
             box-shadow: 0 15px 35px var(--shadow-color);
-            border: 1px solid rgba(37, 99, 235, 0.05);
-            /* Smooth transition animation */
+            border: 1px solid rgba(255, 255, 255, 0.5);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             animation: fadeInUp 0.8s ease-out backwards;
         }
 
-        /* Staggered entrance animation for cards */
         .card:nth-child(1) { animation-delay: 0.2s; }
         .card:nth-child(2) { animation-delay: 0.4s; }
 
-        /* Hover: Float up and deepen shadow */
         .card:hover {
             transform: translateY(-15px);
             box-shadow: 0 30px 60px var(--shadow-hover);
+            background-color: #ffffff; /* Becomes solid white on hover */
         }
 
-        /* Card Text Styles */
         .card h2 {
             color: var(--text-title);
             font-size: 1.5rem;
@@ -115,10 +170,41 @@
             h1 { font-size: 3rem; margin-bottom: 3rem; }
             .projects-container { gap: 2rem; }
             .card { padding: 2.5rem 1.5rem; }
+            .marquee-text { font-size: 4rem; } /* Smaller background text on mobile */
         }
     </style>
 </head>
 <body>
+
+    <!-- Infinite Scrolling Background -->
+    <div class="marquee-container">
+        <!-- Row 1: Moves Left -->
+        <div class="marquee-row left">
+            <!-- Content duplicated twice to create a seamless loop -->
+            <div class="marquee-text">SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK</div>
+            <div class="marquee-text">SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK</div>
+        </div>
+        <!-- Row 2: Moves Right -->
+        <div class="marquee-row right">
+            <div class="marquee-text">SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK</div>
+            <div class="marquee-text">SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK</div>
+        </div>
+        <!-- Row 3: Moves Left -->
+        <div class="marquee-row left">
+            <div class="marquee-text">SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK</div>
+            <div class="marquee-text">SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK</div>
+        </div>
+        <!-- Row 4: Moves Right -->
+        <div class="marquee-row right">
+            <div class="marquee-text">SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK</div>
+            <div class="marquee-text">SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK</div>
+        </div>
+        <!-- Row 5: Moves Left -->
+        <div class="marquee-row left">
+            <div class="marquee-text">SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK</div>
+            <div class="marquee-text">SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK SK</div>
+        </div>
+    </div>
 
     <!-- Main Title -->
     <h1>Samuel Kong</h1>

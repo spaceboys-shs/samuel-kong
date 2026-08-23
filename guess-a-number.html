@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0-100 Number Guessing Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+        }
+        .game-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .input-area {
+            margin: 20px 0;
+        }
+        input[type="number"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 120px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        #restart-btn {
+            display: none;
+            margin-top: 15px;
+            background-color: #28a745;
+        }
+        #restart-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h2>Number Guessing Game</h2>
+    <p>I'm thinking of a number between <strong>0 and 100</strong>.</p>
+    
+    <div class="input-area">
+        <input type="number" id="guess-input" min="0" max="100" placeholder="e.g. 50">
+        <button id="submit-btn" onclick="checkGuess()">Guess</button>
+    </div>
+    
+    <div id="message"></div>
+    <button id="restart-btn" onclick="initGame()">Play Again</button>
+</div>
+
+<script>
+    let targetNumber;
+    
+    const messageEl = document.getElementById('message');
+    const inputEl = document.getElementById('guess-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // Initialize or reset the game
+    function initGame() {
+        // Generate a random number between 0 and 100 (inclusive)
+        targetNumber = Math.floor(Math.random() * 101); 
+        
+        messageEl.textContent = "";
+        messageEl.style.color = "black";
+        
+        inputEl.value = "";
+        inputEl.disabled = false;
+        submitBtn.disabled = false;
+        restartBtn.style.display = "none";
+        
+        inputEl.focus();
+    }
+
+    // Check the player's guess
+    function checkGuess() {
+        const guess = parseInt(inputEl.value);
+
+        // Validate input
+        if (isNaN(guess) || guess < 0 || guess > 100) {
+            messageEl.textContent = "Please enter a valid number between 0 and 100.";
+            messageEl.style.color = "red";
+            return;
+        }
+
+        // Compare guess to the target number
+        if (guess === targetNumber) {
+            messageEl.textContent = `Correct! The number was ${targetNumber}. 🎉`;
+            messageEl.style.color = "green";
+            endGame();
+        } else if (guess > targetNumber) {
+            messageEl.textContent = "Too big! Try a lower number.";
+            messageEl.style.color = "orange";
+        } else {
+            messageEl.textContent = "Too low! Try a higher number.";
+            messageEl.style.color = "orange";
+        }
+        
+        // Clear input for the next guess
+        inputEl.value = "";
+        inputEl.focus();
+    }
+
+    // Allow the player to press "Enter" to submit their guess
+    inputEl.addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            checkGuess();
+        }
+    });
+
+    // End the game state
+    function endGame() {
+        inputEl.disabled = true;
+        submitBtn.disabled = true;
+        restartBtn.style.display = "inline-block";
+    }
+
+    // Start the game for the first time when the page loads
+    initGame();
+</script>
+
+</body>
+</html>

@@ -3,25 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timeline & Countdown</title>
+    <title>Samuel Kong</title>
     <style>
-        /* Base Variables & Reset */
+        /* Color Variables - Blue Theme */
         :root {
-            --bg-color: #f8fafc;
+            --bg-color: #ffffff;
+            --text-main: #1e3a8a; /* Dark blue for the main title */
+            --text-title: #2563eb; /* Bright blue for card titles */
+            --text-desc: #60a5fa; /* Light blue for description text */
             --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --unit-bg: #f1f5f9;
-            --error-bg: #fef2f2;
-            --error-text: #ef4444;
+            --shadow-color: rgba(37, 99, 235, 0.1);
+            --shadow-hover: rgba(37, 99, 235, 0.25);
         }
 
+        /* Base Reset & Typography */
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
@@ -30,644 +29,116 @@
             color: var(--text-main);
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* Top Navigation / Auth Area */
-        .top-nav {
-            display: flex;
-            justify-content: flex-end;
-            padding: 1.5rem 2rem;
             align-items: center;
-        }
-
-        .auth-controls {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        /* Buttons */
-        .btn {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            font-family: inherit;
-        }
-
-        .btn:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            color: var(--text-main);
-            border: 2px solid #e2e8f0;
-        }
-
-        .btn-outline:hover {
-            background-color: var(--unit-bg);
-        }
-
-        .btn-text {
-            background: none;
-            color: var(--text-muted);
-            padding: 0;
-            font-size: 0.9rem;
-        }
-
-        .btn-text:hover {
-            color: var(--text-main);
-            text-decoration: underline;
-            background: none;
-        }
-
-        .btn-full {
-            width: 100%;
-            margin-top: 1rem;
-        }
-
-        .username-display {
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        /* Main Container Layout */
-        .main-content {
-            display: flex;
             justify-content: center;
-            align-items: center;
-            flex-grow: 1;
-            padding: 2rem 1rem;
+            min-height: 100vh;
+            padding: 2rem;
+            overflow-x: hidden;
         }
 
-        .container {
-            background: var(--card-bg);
-            border-radius: 32px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            max-width: 900px;
-            padding: 5rem 3rem;
-            text-align: center;
-        }
-
-        /* Typography */
+        /* Main Title Styles */
         h1 {
-            font-size: 3rem;
+            font-size: 4rem;
             font-weight: 800;
-            letter-spacing: -0.03em;
-            margin-bottom: 0.5rem;
+            letter-spacing: -0.05em;
+            margin-bottom: 4rem;
+            text-align: center;
+            animation: fadeInDown 0.8s ease-out;
         }
 
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-bottom: 4rem;
+        /* Projects Container */
+        .projects-container {
+            display: flex;
+            gap: 3rem;
+            max-width: 900px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap; /* Automatically wrap on smaller screens */
+        }
+
+        /* Floating Card Styles */
+        .card {
+            background-color: var(--card-bg);
+            text-decoration: none; /* Remove underline from links */
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            flex: 1;
+            min-width: 280px;
+            max-width: 400px;
+            text-align: center;
+            /* Initial shadow for floating effect */
+            box-shadow: 0 15px 35px var(--shadow-color);
+            border: 1px solid rgba(37, 99, 235, 0.05);
+            /* Smooth transition animation */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fadeInUp 0.8s ease-out backwards;
+        }
+
+        /* Staggered entrance animation for cards */
+        .card:nth-child(1) { animation-delay: 0.2s; }
+        .card:nth-child(2) { animation-delay: 0.4s; }
+
+        /* Hover: Float up and deepen shadow */
+        .card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 30px 60px var(--shadow-hover);
+        }
+
+        /* Card Text Styles */
+        .card h2 {
+            color: var(--text-title);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            color: var(--text-desc);
+            font-size: 1rem;
+            line-height: 1.6;
             font-weight: 500;
         }
 
-        /* Input Section */
-        .input-section {
-            margin-bottom: 4rem;
-        }
-
-        input[type="datetime-local"], 
-        input[type="email"], 
-        input[type="password"] {
-            font-family: inherit;
-            font-size: 1.1rem;
-            padding: 1rem 1.5rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            color: var(--text-main);
-            background-color: var(--card-bg);
-            outline: none;
-            transition: all 0.2s ease;
-            width: 100%;
-        }
-
-        input[type="datetime-local"] {
-            font-size: 1.25rem;
-            max-width: 400px;
-            cursor: pointer;
-        }
-
-        input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
-
-        .auth-inputs {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        /* Results Display */
-        #results {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        /* Simple Entrance Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .total-days {
-            font-size: 5rem;
-            font-weight: 800;
-            color: var(--accent);
-            line-height: 1;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .total-days-label {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-top: 1rem;
-            margin-bottom: 4rem;
-            font-weight: 600;
-        }
-
-        /* Breakdown Grid */
-        .breakdown {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1.5rem;
-        }
-
-        .time-box {
-            background: var(--unit-bg);
-            border-radius: 20px;
-            padding: 1.5rem 1rem;
-            flex: 1 1 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .time-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-main);
-            font-variant-numeric: tabular-nums;
-        }
-
-        .time-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 0.5rem;
-            font-weight: 600;
-        }
-
-        #pastMessage {
-            display: none;
-            color: var(--error-text);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-top: 2rem;
-            padding: 2rem;
-            background: var(--error-bg);
-            border-radius: 16px;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(4px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            padding: 3rem;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 400px;
-            position: relative;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .close-btn:hover {
-            color: var(--text-main);
-        }
-
-        .modal-title {
-            font-size: 1.8rem;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 1.5rem 0;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .divider::before, .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .divider:not(:empty)::before { margin-right: .5em; }
-        .divider:not(:empty)::after { margin-left: .5em; }
-
-        .toggle-text {
-            text-align: center;
-            margin-top: 1.5rem;
-            font-size: 0.95rem;
-            color: var(--text-muted);
-        }
-
-        .toggle-text a {
-            color: var(--accent);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .toggle-text a:hover {
-            text-decoration: underline;
-        }
-
-        #authError {
-            display: none;
-            background: var(--error-bg);
-            color: var(--error-text);
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-            text-align: center;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Mobile Responsiveness */
         @media (max-width: 600px) {
-            .top-nav { padding: 1rem; justify-content: center; }
-            .container { padding: 3rem 1.5rem; }
-            h1 { font-size: 2.2rem; }
-            .subtitle { font-size: 0.95rem; margin-bottom: 3rem; }
-            .total-days { font-size: 3.5rem; }
-            .total-days-label { font-size: 1rem; margin-bottom: 3rem; }
-            .breakdown { gap: 1rem; }
-            .time-box { padding: 1rem; flex: 1 1 80px; border-radius: 16px; }
-            .time-value { font-size: 1.8rem; }
-            input[type="datetime-local"] { font-size: 1rem; padding: 0.8rem 1rem; }
-            .modal-content { padding: 2rem; }
+            h1 { font-size: 3rem; margin-bottom: 3rem; }
+            .projects-container { gap: 2rem; }
+            .card { padding: 2.5rem 1.5rem; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Top Navigation / Auth -->
-    <header class="top-nav">
-        <!-- Logged Out State -->
-        <button id="openModalBtn" class="btn">Login / Sign Up</button>
+    <!-- Main Title -->
+    <h1>Samuel Kong</h1>
+
+    <!-- Cards Container -->
+    <div class="projects-container">
         
-        <!-- Logged In State (Hidden by default) -->
-        <div id="loggedInState" class="auth-controls" style="display: none;">
-            <span id="usernameDisplay" class="username-display"></span>
-            <button id="signOutBtn" class="btn btn-text">Sign out</button>
-        </div>
-    </header>
+        <!-- Card 1: Countdown App -->
+        <a href="/countdown.html" class="card">
+            <h2>Timeline & Countdown</h2>
+            <p>A precision countdown web app based on Malaysia (GMT+8) time zone with Firebase Auth.</p>
+        </a>
 
-    <!-- Main Countdown App -->
-    <main class="main-content">
-        <div class="container">
-            <h1>Select a Date</h1>
-            <p class="subtitle">Calculations based on Malaysia Time (GMT+8)</p>
+        <!-- Card 2: Number Guessing Game -->
+        <a href="/guess-a-number.html" class="card">
+            <h2>Number Guessing</h2>
+            <p>A fun and interactive mini-game. Test your luck and guess the hidden number from 0 to 100.</p>
+        </a>
 
-            <div class="input-section">
-                <input type="datetime-local" id="targetDate" aria-label="Select Date and Time">
-            </div>
-
-            <div id="results">
-                <div class="total-days" id="totalDays">0.00000</div>
-                <div class="total-days-label">Total Days Remaining</div>
-
-                <div class="breakdown">
-                    <div class="time-box" id="box-years"><span class="time-value" id="val-years">0</span><span class="time-label">Years</span></div>
-                    <div class="time-box" id="box-months"><span class="time-value" id="val-months">0</span><span class="time-label">Months</span></div>
-                    <div class="time-box" id="box-weeks"><span class="time-value" id="val-weeks">0</span><span class="time-label">Weeks</span></div>
-                    <div class="time-box" id="box-days"><span class="time-value" id="val-days">0</span><span class="time-label">Days</span></div>
-                    <div class="time-box" id="box-hours"><span class="time-value" id="val-hours">0</span><span class="time-label">Hours</span></div>
-                    <div class="time-box" id="box-minutes"><span class="time-value" id="val-minutes">0</span><span class="time-label">Minutes</span></div>
-                    <div class="time-box" id="box-seconds"><span class="time-value" id="val-seconds">0</span><span class="time-label">Seconds</span></div>
-                </div>
-            </div>
-
-            <div id="pastMessage">The selected date has already passed!</div>
-        </div>
-    </main>
-
-    <!-- Authentication Modal -->
-    <div id="authModal" class="modal-overlay">
-        <div class="modal-content">
-            <button id="closeModalBtn" class="close-btn" aria-label="Close">&times;</button>
-            <h2 id="modalTitle" class="modal-title">Log in</h2>
-            
-            <div id="authError"></div>
-
-            <form id="authForm">
-                <div class="auth-inputs">
-                    <input type="email" id="emailInput" placeholder="Email address" required>
-                    <input type="password" id="passwordInput" placeholder="Password" required minlength="6">
-                </div>
-                <button type="submit" id="submitAuthBtn" class="btn btn-full">Log in</button>
-            </form>
-
-            <div class="divider">or</div>
-
-            <button id="googleSignInBtn" class="btn btn-outline btn-full">
-                Sign in with Google
-            </button>
-
-            <p class="toggle-text">
-                <span id="toggleText">Don't have an account?</span> 
-                <a href="#" id="toggleModeBtn">Sign up</a>
-            </p>
-        </div>
     </div>
 
-    <!-- Firebase & Application Logic -->
-    <script type="module">
-        /*
-         * IMPORTANT: FIREBASE CONFIGURATION REQUIRED
-         * To make authentication work, you must create a Firebase project,
-         * enable Email/Password and Google sign-in methods in the Firebase console,
-         * and paste your config object below.
-         * Note: These keys are safe to expose publicly in client-side code, 
-         * but ensure you set up appropriate Security Rules in your Firebase console.
-         */
-        
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            GoogleAuthProvider, 
-            signInWithPopup, 
-            signOut, 
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-
-        // PASTE YOUR FIREBASE CONFIG HERE
-        const firebaseConfig = {
-          apiKey: "AIzaSyDotEBZy4yzwn78YPyknBffIvBd3fswghA",
-          authDomain: "spaceboys-countdown.firebaseapp.com",
-          projectId: "spaceboys-countdown",
-          storageBucket: "spaceboys-countdown.firebasestorage.app",
-          messagingSenderId: "762252811098",
-          appId: "1:762252811098:web:b1ea1acc0a1a5040643163",
-        };
-
-        // Check if config is filled (prevents crash if user tests without keys)
-        let auth = null;
-        let googleProvider = null;
-        if (firebaseConfig.apiKey !== "") {
-            const app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            googleProvider = new GoogleAuthProvider();
-        } else {
-            console.warn("Firebase config is empty. Authentication features will not work.");
-        }
-
-        // --- AUTHENTICATION UI LOGIC ---
-        const authModal = document.getElementById('authModal');
-        const openModalBtn = document.getElementById('openModalBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const loggedInState = document.getElementById('loggedInState');
-        const usernameDisplay = document.getElementById('usernameDisplay');
-        const signOutBtn = document.getElementById('signOutBtn');
-        const authForm = document.getElementById('authForm');
-        const googleSignInBtn = document.getElementById('googleSignInBtn');
-        const toggleModeBtn = document.getElementById('toggleModeBtn');
-        const authError = document.getElementById('authError');
-
-        let isSignUpMode = false;
-
-        // Open/Close Modal
-        openModalBtn.addEventListener('click', () => { authModal.classList.add('active'); hideError(); });
-        closeModalBtn.addEventListener('click', () => authModal.classList.remove('active'));
-        authModal.addEventListener('click', (e) => {
-            if(e.target === authModal) authModal.classList.remove('active');
-        });
-
-        // Toggle Login / Sign Up UI
-        toggleModeBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            isSignUpMode = !isSignUpMode;
-            hideError();
-            
-            document.getElementById('modalTitle').textContent = isSignUpMode ? 'Create an account' : 'Log in';
-            document.getElementById('submitAuthBtn').textContent = isSignUpMode ? 'Sign up' : 'Log in';
-            document.getElementById('toggleText').textContent = isSignUpMode ? 'Already have an account?' : "Don't have an account?";
-            toggleModeBtn.textContent = isSignUpMode ? 'Log in' : 'Sign up';
-        });
-
-        // Error handling helper
-        function showError(message) {
-            authError.textContent = message;
-            authError.style.display = 'block';
-        }
-        
-        function hideError() {
-            authError.style.display = 'none';
-        }
-
-        function translateAuthError(code) {
-            switch(code) {
-                case 'auth/invalid-credential':
-                case 'auth/user-not-found':
-                case 'auth/wrong-password':
-                    return "Incorrect email or password.";
-                case 'auth/email-already-in-use':
-                    return "An account with this email already exists.";
-                case 'auth/weak-password':
-                    return "Password should be at least 6 characters.";
-                case 'auth/popup-closed-by-user':
-                    return "Sign-in popup was closed before finishing.";
-                default:
-                    return "Something went wrong. Please try again.";
-            }
-        }
-
-        // Form Submit (Email/Password)
-        authForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (!auth) return showError("Firebase not configured.");
-            
-            const email = document.getElementById('emailInput').value;
-            const password = document.getElementById('passwordInput').value;
-            
-            const authPromise = isSignUpMode 
-                ? createUserWithEmailAndPassword(auth, email, password)
-                : signInWithEmailAndPassword(auth, email, password);
-
-            authPromise
-                .then(() => {
-                    authModal.classList.remove('active');
-                    authForm.reset();
-                })
-                .catch((error) => showError(translateAuthError(error.code)));
-        });
-
-        // Google Sign In
-        googleSignInBtn.addEventListener('click', () => {
-            if (!auth) return showError("Firebase not configured.");
-            signInWithPopup(auth, googleProvider)
-                .then(() => authModal.classList.remove('active'))
-                .catch((error) => showError(translateAuthError(error.code)));
-        });
-
-        // Sign Out
-        signOutBtn.addEventListener('click', () => {
-            if(auth) signOut(auth);
-        });
-
-        // Monitor Auth State
-        if (auth) {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    // Logged in
-                    openModalBtn.style.display = 'none';
-                    loggedInState.style.display = 'flex';
-                    // Show Display Name (Google) or fallback to Email
-                    usernameDisplay.textContent = user.displayName || user.email.split('@')[0];
-                } else {
-                    // Logged out
-                    openModalBtn.style.display = 'block';
-                    loggedInState.style.display = 'none';
-                    usernameDisplay.textContent = "";
-                }
-            });
-        }
-
-        // --- COUNTDOWN LOGIC (Untouched styling & calculations) ---
-        const input = document.getElementById('targetDate');
-        const results = document.getElementById('results');
-        const pastMessage = document.getElementById('pastMessage');
-
-        const second = 1000, minute = second * 60, hour = minute * 60;
-        const day = hour * 24, week = day * 7, month = day * 30.436875, year = day * 365.2425;
-        let timerInterval;
-
-        const savedDate = localStorage.getItem('myCountdownDate');
-        if (savedDate) { input.value = savedDate; startTimer(); }
-
-        input.addEventListener('change', () => {
-            if (input.value) {
-                localStorage.setItem('myCountdownDate', input.value);
-                startTimer();
-            } else {
-                localStorage.removeItem('myCountdownDate');
-                stopTimer();
-            }
-        });
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            calculateTime(); 
-            timerInterval = setInterval(calculateTime, 1000);
-        }
-
-        function stopTimer() {
-            clearInterval(timerInterval);
-            results.style.display = 'none';
-            pastMessage.style.display = 'none';
-        }
-
-        function calculateTime() {
-            const inputVal = input.value;
-            if (!inputVal) return stopTimer();
-
-            // Treat as Malaysia Time (GMT+8)
-            const targetStr = inputVal + ':00+08:00';
-            const targetTime = new Date(targetStr).getTime();
-            const now = new Date().getTime(); 
-            const diff = targetTime - now;
-
-            if (diff < 0) {
-                clearInterval(timerInterval);
-                results.style.display = 'none';
-                pastMessage.style.display = 'block';
-                return;
-            }
-
-            results.style.display = 'block';
-            pastMessage.style.display = 'none';
-
-            const exactTotalDays = (diff / day).toFixed(5); 
-            document.getElementById('totalDays').textContent = exactTotalDays;
-
-            let remaining = diff;
-            const y = Math.floor(remaining / year); remaining -= y * year;
-            const m = Math.floor(remaining / month); remaining -= m * month;
-            const w = Math.floor(remaining / week); remaining -= w * week;
-            const d = Math.floor(remaining / day); remaining -= d * day;
-            const h = Math.floor(remaining / hour); remaining -= h * hour;
-            const min = Math.floor(remaining / minute); remaining -= min * minute;
-            const s = Math.floor(remaining / second);
-
-            const timeData = [
-                { id: 'box-years', valId: 'val-years', value: y },
-                { id: 'box-months', valId: 'val-months', value: m },
-                { id: 'box-weeks', valId: 'val-weeks', value: w },
-                { id: 'box-days', valId: 'val-days', value: d },
-                { id: 'box-hours', valId: 'val-hours', value: h },
-                { id: 'box-minutes', valId: 'val-minutes', value: min },
-                { id: 'box-seconds', valId: 'val-seconds', value: s }
-            ];
-
-            let showRemaining = false;
-            timeData.forEach((unit, index) => {
-                document.getElementById(unit.valId).textContent = unit.value;
-                const box = document.getElementById(unit.id);
-                if (unit.value > 0 || showRemaining || index === timeData.length - 1) {
-                    box.style.display = 'flex';
-                    showRemaining = true;
-                } else {
-                    box.style.display = 'none';
-                }
-            });
-        }
-    </script>
 </body>
 </html>

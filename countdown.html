@@ -449,6 +449,8 @@
                 <div class="auth-inputs">
                     <input type="text" id="displayNameInput" placeholder="Your Name" required>
                     <input type="text" id="bioInput" placeholder="A short bio...">
+                    <input type="text" id="ageInput" placeholder="Your Age">
+                    <input type="text" id="genderInput" placeholder="Your Gender">
                 </div>
                 <button type="submit" class="btn btn-full">Save Profile</button>
             </form>
@@ -525,6 +527,8 @@
         const profileForm = document.getElementById('profileForm');
         const displayNameInput = document.getElementById('displayNameInput');
         const bioInput = document.getElementById('bioInput');
+        const ageInput = document.getElementById('ageInput');
+        const genderInput = document.getElementById('genderInput');
         const profileSuccess = document.getElementById('profileSuccess');
 
         let isSignUpMode = false;
@@ -562,11 +566,15 @@
     
             const newName = displayNameInput.value;
             const newBio = bioInput.value;
+            const newAge = ageInput.value;
+            const newGender = genderInput.value;
     
             try {
                 await setDoc(doc(db, "users", auth.currentUser.uid), {
                     displayName: newName,
                     bio: newBio,
+                    age: newAge,
+                    gender: newGender,
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
         

@@ -322,6 +322,20 @@
         .divider:not(:empty)::before { margin-right: .5em; }
         .divider:not(:empty)::after { margin-left: .5em; }
 
+        select {
+            font-family: inherit;
+            font-size: 1.1rem;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            color: var(--text-main);
+            background-color: var(--card-bg);
+            outline: none;
+            transition: all 0.2s ease;
+            width: 100%;
+            cursor: pointer;
+        }
+
         .toggle-text {
             text-align: center;
             margin-top: 1.5rem;
@@ -449,8 +463,14 @@
                 <div class="auth-inputs">
                     <input type="text" id="displayNameInput" placeholder="Your Name" required>
                     <input type="text" id="bioInput" placeholder="A short bio...">
-                    <input type="text" id="ageInput" placeholder="Your Age">
-                    <input type="text" id="genderInput" placeholder="Your Gender">
+                    <input type="number" id="ageInput" placeholder="Your Age">
+                    <select id="genderInput">
+                        <option value="" disabled selected>Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                        <option value="Prefer-not-to-say">Prefer not to say</option>
+                    </select>
                 </div>
                 <button type="submit" class="btn btn-full">Save Profile</button>
             </form>
@@ -546,9 +566,13 @@
                     const data = docSnap.data();
                     displayNameInput.value = data.displayName || "";
                     bioInput.value = data.bio || "";
+                    ageInput.value = data.age || "";
+                    genderInput.value = data.gender || "";
                 } else {
                     displayNameInput.value = auth.currentUser.displayName || auth.currentUser.email.split('@')[0];
                     bioInput.value = "";
+                    ageInput.value = "";
+                    genderInput.value = "";
                 }
             } catch (error) {
                 console.error("Error fetching profile:", error);
@@ -568,7 +592,15 @@
             const newBio = bioInput.value;
             const newAge = ageInput.value;
             const newGender = genderInput.value;
-    
+
+            if (newAge !== "") {
+                const ageNum = Number(newAge);
+                if (isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
+                    alert("Please enter a valid age between 1 and 120.");
+                    return;
+                }
+            }
+            
             try {
                 await setDoc(doc(db, "users", auth.currentUser.uid), {
                     displayName: newName,

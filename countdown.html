@@ -364,6 +364,7 @@
         <!-- Logged In State (Hidden by default) -->
         <div id="loggedInState" class="auth-controls" style="display: none;">
             <span id="usernameDisplay" class="username-display"></span>
+            <button id="editProfileBtn" class="btn btn-outline">Edit Profile</button>
             <button id="signOutBtn" class="btn btn-text">Sign out</button>
         </div>
     </header>
@@ -426,6 +427,23 @@
         </div>
     </div>
 
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="closeProfileBtn" class="close-btn" aria-label="Close">&times;</button>
+            <h2 class="modal-title">Edit Profile</h2>
+        
+            <form id="profileForm">
+                <div class="auth-inputs">
+                    <input type="text" id="displayNameInput" placeholder="Your Name" required>
+                    <input type="text" id="bioInput" placeholder="A short bio...">
+                </div>
+                <button type="submit" class="btn btn-full">Save Profile</button>
+            </form>
+            <div id="profileSuccess" style="display: none; color: #10b981; text-align: center; margin-top: 1rem; font-weight: 600;">Profile saved successfully!</div>
+        </div>
+    </div>
+    
     <!-- Firebase & Application Logic -->
     <script type="module">
         /*
@@ -445,7 +463,11 @@
             GoogleAuthProvider, 
             signInWithPopup, 
             signOut, 
-            onAuthStateChanged 
+            onAuthStateChanged,
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc
         } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
         // PASTE YOUR FIREBASE CONFIG HERE
@@ -465,6 +487,7 @@
             const app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             googleProvider = new GoogleAuthProvider();
+            db = getFirestore(app);
         } else {
             console.warn("Firebase config is empty. Authentication features will not work.");
         }
@@ -480,8 +503,67 @@
         const googleSignInBtn = document.getElementById('googleSignInBtn');
         const toggleModeBtn = document.getElementById('toggleModeBtn');
         const authError = document.getElementById('authError');
+        const profileModal = document.getElementById('profileModal');
+        const editProfileBtn = document.getElementById('editProfileBtn');
+        const closeProfileBtn = document.getElementById('closeProfileBtn');
+        const profileForm = document.getElementById('profileForm');
+        const displayNameInput = document.getElementById('displayNameInput');
+        const bioInput = document.getElementById('bioInput');
+        const profileSuccess = document.getElementById('profileSuccess');
 
         let isSignUpMode = false;
+
+        editProfileBtn.addEventListener('click', async () => {
+            if (!auth.currentUser) return;
+            profileModal.classList.add('active');
+            profileSuccess.style.display = 'none';
+    
+            try {
+                const docRef = doc(db, "users", auth.currentUser.uid);
+                const docSnap = await getDoc(docRef);
+        
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    displayNameInput.value = data.displayName || "";
+                    bioInput.value = data.bio || "";
+                } else {
+                    displayNameInput.value = auth.currentUser.displayName || auth.currentUser.email.split('@')[0];
+                    bioInput.value = "";
+                }
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+            }
+        });
+
+        closeProfileBtn.addEventListener('click', () => profileModal.classList.remove('active'));
+        profileModal.addEventListener('click', (e) => {
+            if(e.target === profileModal) profileModal.classList.remove('active');
+        });
+
+        profileForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!auth.currentUser) return;
+    
+            const newName = displayNameInput.value;
+            const newBio = bioInput.value;
+    
+            try {
+                await setDoc(doc(db, "users", auth.currentUser.uid), {
+                    displayName: newName,
+                    bio: newBio,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+        
+                usernameDisplay.textContent = newName;
+        
+                profileSuccess.style.display = 'block';
+                setTimeout(() => {
+                    profileModal.classList.remove('active');
+                }, 1500);
+            } catch (error) {
+                console.error("Error saving profile:", error);
+            }
+        });
 
         // Open/Close Modal
         openModalBtn.addEventListener('click', () => { authModal.classList.add('active'); hideError(); });
@@ -569,8 +651,18 @@
                     // Logged in
                     openModalBtn.style.display = 'none';
                     loggedInState.style.display = 'flex';
-                    // Show Display Name (Google) or fallback to Email
+            
                     usernameDisplay.textContent = user.displayName || user.email.split('@')[0];
+            
+                    try {
+                        const docRef = doc(db, "users", user.uid);
+                        const docSnap = await getDoc(docRef);
+                       if (docSnap.exists() && docSnap.data().displayName) {
+                            usernameDisplay.textContent = docSnap.data().displayName;
+                        }
+                    } catch (error) {
+                        console.log("Could not load custom profile name");
+                   }
                 } else {
                     // Logged out
                     openModalBtn.style.display = 'block';

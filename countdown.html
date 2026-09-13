@@ -463,12 +463,15 @@
             GoogleAuthProvider, 
             signInWithPopup, 
             signOut, 
-            onAuthStateChanged,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        
+        import { 
             getFirestore, 
             doc, 
             setDoc, 
-            getDoc
-        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+            getDoc 
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // PASTE YOUR FIREBASE CONFIG HERE
         const firebaseConfig = {
@@ -483,6 +486,7 @@
         // Check if config is filled (prevents crash if user tests without keys)
         let auth = null;
         let googleProvider = null;
+        let db = null;
         if (firebaseConfig.apiKey !== "") {
             const app = initializeApp(firebaseConfig);
             auth = getAuth(app);
@@ -646,7 +650,7 @@
 
         // Monitor Auth State
         if (auth) {
-            onAuthStateChanged(auth, (user) => {
+            onAuthStateChanged(auth, async(user) => {
                 if (user) {
                     // Logged in
                     openModalBtn.style.display = 'none';
